@@ -7,6 +7,7 @@ import logo from "../../assets/Cofee-Logo.png";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -23,11 +24,12 @@ const Header = () => {
   ];
 
   const toggleMenu = () => setIsOpen((prev) => !prev);
+  const toggleSearch = () => setShowSearch((prev) => !prev);
 
   return (
     <>
       <header className="flex items-center justify-between px-8 md:px-10 py-4 shadow-md bg-white">
-        {/* Logo + Brand */}
+        {/* Logo */}
         <div className="flex items-center space-x-2">
           <img src={logo} alt="UnitScreen Logo" className="w-16 h-auto" />
         </div>
@@ -40,27 +42,46 @@ const Header = () => {
           {isOpen ? <AiOutlineClose /> : <BiMenu />}
         </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation or Search */}
         <nav className="hidden lg:flex items-center space-x-6">
-          {Nav.map((item) => (
-            <Link
-              key={item.id}
-              to={item.link}
-              className={`text-sm open-sans-normal transition-colors duration-200 ${
-                currentPath === item.link
-                  ? "text-[#0b69d4] font-semibold"
-                  : "text-gray-800 hover:text-[#2ea3f2]"
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
-          <FiSearch className="text-xl text-gray-600 hover:text-[#2ea3f2] cursor-pointer" />
+          {showSearch ? (
+            <>
+              <input
+                type="text"
+                placeholder="Search..."
+                className="px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              />
+              <FiSearch
+                className="text-xl text-gray-600 hover:text-[#2ea3f2] cursor-pointer"
+                onClick={toggleSearch}
+              />
+            </>
+          ) : (
+            <>
+              {Nav.map((item) => (
+                <Link
+                  key={item.id}
+                  to={item.link}
+                  className={`text-sm open-sans-normal transition-colors duration-200 ${
+                    currentPath === item.link
+                      ? "text-[#0b69d4] font-semibold"
+                      : "text-gray-800 hover:text-[#2ea3f2]"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              <FiSearch
+                className="text-xl text-gray-600 hover:text-[#2ea3f2] cursor-pointer"
+                onClick={toggleSearch}
+              />
+            </>
+          )}
         </nav>
       </header>
 
       {/* Mobile Navigation */}
-      {isOpen && (
+      {isOpen && !showSearch && (
         <nav className="lg:hidden bg-white shadow-md">
           {Nav.map((item) => (
             <Link
@@ -76,7 +97,35 @@ const Header = () => {
               {item.name}
             </Link>
           ))}
+          <div className="px-5 py-3">
+            <button
+              onClick={() => {
+                setShowSearch(true);
+                setIsOpen(false);
+              }}
+              className="text-gray-600 hover:text-[#2ea3f2] text-sm"
+            >
+              Search
+            </button>
+          </div>
         </nav>
+      )}
+
+      {/* Mobile Search Bar */}
+      {showSearch && (
+        <div className="lg:hidden bg-white shadow-md px-5 py-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+          <button
+            onClick={() => setShowSearch(false)}
+            className="mt-2 text-sm text-blue-600 hover:underline"
+          >
+            Close Search
+          </button>
+        </div>
       )}
     </>
   );
